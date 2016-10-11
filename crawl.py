@@ -4,11 +4,12 @@
 import requests
 import grequests
 import logging
+import sys
 from lxml import etree
 
 root_url = "http://bj.lianjia.com"
 
-FORMAT = "[%(asctime)-15s] %(message)s"
+FORMAT = "[%(asctime)-15s][%(message)s]"
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('crawler')
 logger.setLevel(logging.INFO)
@@ -75,6 +76,12 @@ def get_community_houses(url):
         rs = (grequests.get(page_url) for page_url in group)
         res = grequests.map(rs)
         for r in res:
+            if r is None:
+                logger.warning("response is None.")
+                continue
+            if r.status_code != 200:
+                logger.warning("{0} {1} {2}".format(r.status_code, r.reason, r.url))
+                continue
             root = etree.HTML(r.content)
             house_nodes = root.xpath("//ul[@id=\"house-lst\"]/li/div[@class=\"info-panel\"]")
             for node in house_nodes:
@@ -84,7 +91,8 @@ def get_community_houses(url):
 
 
 if __name__ == '__main__':
-    urls = get_community_seed_urls() 
+    urls = get_community_seed_urls()
+    print(urls)
     for name, url in urls:
         print(name, url)
         lst = get_community_houses('{0}{1}'.format(root_url, url))
