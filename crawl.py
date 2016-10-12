@@ -9,7 +9,7 @@ from lxml import etree
 
 root_url = "http://bj.lianjia.com"
 
-FORMAT = "[%(asctime)-15s][%(message)s]"
+FORMAT = "[%(asctime)-15s][%(levelname)s][%(message)s]"
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('crawler')
 logger.setLevel(logging.INFO)
@@ -91,6 +91,7 @@ def get_community_houses(url):
 
 
 if __name__ == '__main__':
+    logger.info("start crawling...")
     urls = get_community_seed_urls()
     print(urls)
     for name, url in urls:
